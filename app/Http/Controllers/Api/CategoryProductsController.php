@@ -16,7 +16,10 @@ class CategoryProductsController extends Controller
      */
     public function index(Category $category): ProductCollection
     {
-        $products = $category->products()->paginate(25);
+        $products = $category
+            ->products()
+            ->wherePublished()
+            ->paginate(25);
 
         return new ProductCollection($products);
     }

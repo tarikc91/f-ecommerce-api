@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\ProductCollection;
 
 class ProductsController extends Controller
 {
@@ -18,7 +18,9 @@ class ProductsController extends Controller
      */
     public function index(Request $request): ProductCollection
     {
-        $products = Product::filter($request->all())->paginate(25);
+        $products = Product::filter($request->all())
+            ->wherePublished()
+            ->paginate(25);
 
         return new ProductCollection($products);
     }

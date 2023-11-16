@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\CategoryProductsController;
 
 Route::prefix('products')->group(function () {
     Route::get('/', [ProductsController::class, 'index']);
-    Route::get('{product}', [ProductsController::class, 'show']);
+    Route::get('{publishedProduct}', [ProductsController::class, 'show']);
 });
 
 Route::get('categories/{category}/products', [CategoryProductsController::class, 'index']);
