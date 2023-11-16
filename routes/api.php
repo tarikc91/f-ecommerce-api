@@ -1,7 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\OrdersController;
+use App\Http\Controllers\Api\ProductsController;
+use App\Http\Controllers\Api\CategoryProductsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('products')->group(function () {
+    Route::get('/', [ProductsController::class, 'index']);
+    Route::get('{product}', [ProductsController::class, 'show']);
 });
+
+Route::get('categories/{category}/products', [CategoryProductsController::class, 'index']);
+Route::post('orders', [OrdersController::class, 'store']);
