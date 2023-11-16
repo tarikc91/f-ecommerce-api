@@ -2,16 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\Product;
+use App\Models\PriceList;
 use Illuminate\Database\Seeder;
 
-class ProductsSeeder extends Seeder
+class PriceListsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Product::factory(1000)->create();
+        PriceList::factory(5)->create();
     }
 }

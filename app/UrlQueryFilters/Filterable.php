@@ -60,7 +60,7 @@ trait Filterable
             return static::$urlQueryFilters;
         }
 
-        throw new Exception('Static property $urlQueryFilters not defined on ' . static::class);
+        throw new Exception(sprintf('Static property $urlQueryFilters not defined on %s', static::class));
     }
 
     /**

@@ -52,4 +52,16 @@ class Product extends Model
     {
         return $this->belongsToMany(Category::class);
     }
+
+    /**
+     * Gets all price lists for the product
+     *
+     * @return BelongsToMany
+     */
+    public function priceLists(): BelongsToMany
+    {
+        return $this->belongsToMany(PriceList::class)
+            ->using(PriceListProduct::class)
+            ->withPivot('price');
+    }
 }

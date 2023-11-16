@@ -45,7 +45,7 @@ class ProductPriceFilter implements Filter
      */
     public static function isRange(string $value): bool
     {
-        return str_contains('|', $value);
+        return str_contains($value, '|');
     }
 
     /**
