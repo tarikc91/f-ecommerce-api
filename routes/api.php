@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\OrdersController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\CategoryProductsController;
@@ -15,6 +16,9 @@ use App\Http\Controllers\Api\CategoryProductsController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::post('login', [AuthController::class, 'login']);
+Route::post('register', [AuthController::class, 'register']);
 
 Route::prefix('products')->group(function () {
     Route::get('/', [ProductsController::class, 'index']);
