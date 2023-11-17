@@ -12,6 +12,20 @@ class PriceListsSeeder extends Seeder
      */
     public function run(): void
     {
-        PriceList::factory(5)->create();
+        $data = [];
+
+        for($i = 0; $i < 1000; $i++) {
+            $data[] = array_merge(
+                PriceList::factory()->make()->toArray(),
+                [
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]
+            );
+        }
+
+        foreach(array_chunk($data, 1000) as $chunk) {
+            PriceList::insert($chunk);
+        }
     }
 }

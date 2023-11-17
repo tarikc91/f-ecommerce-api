@@ -12,6 +12,20 @@ class ProductsSeeder extends Seeder
      */
     public function run(): void
     {
-        Product::factory(1000)->create();
+        $data = [];
+
+        for($i = 0; $i < 50000; $i++) {
+            $data[] = array_merge(
+                Product::factory()->make()->toArray(),
+                [
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]
+            );
+        }
+
+        foreach(array_chunk($data, 1000) as $chunk) {
+            Product::insert($chunk);
+        }
     }
 }

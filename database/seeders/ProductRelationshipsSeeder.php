@@ -6,6 +6,8 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\PriceList;
 use Illuminate\Database\Seeder;
+use App\Models\CategoryProduct;
+use App\Models\PriceListProduct;
 
 class ProductRelationshipsSeeder extends Seeder
 {
@@ -14,24 +16,28 @@ class ProductRelationshipsSeeder extends Seeder
      */
     public function run(): void
     {
-        $categories = Category::all();
-        $priceLists = PriceList::all();
+        $categories = collect(Category::all()->modelKeys());
+        $priceLists = collect(PriceList::all()->modelKeys());
 
-        Product::limit(500)->chunk(100, function ($products) use ($categories, $priceLists) {
+        Product::limit(25000)->chunk(1000, function ($products) use ($categories, $priceLists) {
+            $categoriesData = [];
+            $priceListsData = [];
+
             foreach ($products as $product) {
-                $product
-                    ->categories()
-                    ->attach($categories->random()->id);
+                $categoriesData[] = [
+                    'product_id' => $product->id,
+                    'category_id' => $categories->random()
+                ];
 
-                $product
-                    ->priceLists()
-                    ->attach(
-                        $priceLists->random()->id,
-                        [
-                            'price' => fake()->numberBetween(100, 1000)
-                        ]
-                    );
+                $priceListsData[] = [
+                    'product_id' => $product->id,
+                    'price_list_id' => $priceLists->random(),
+                    'price' => fake()->numberBetween(100, 1000)
+                ];
             }
+
+            CategoryProduct::insert($categoriesData);
+            PriceListProduct::insert($priceListsData);
         });
     }
 }
