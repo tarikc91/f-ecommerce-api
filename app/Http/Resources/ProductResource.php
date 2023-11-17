@@ -18,12 +18,18 @@ class ProductResource extends JsonResource
             'id' => (int) $this->id,
             'name' => $this->name,
             'description'  => $this->description,
-            'default_price_ex_tax' => $this->defaultPriceExTax(),
+
+            'price' => $this->price,
+            'price_list_price' => $this->price_list_price,
+            'contract_price' => $this->contract_price,
+            'final_price' => $this->final_price,
+
+            /* 'default_price_ex_tax' => $this->defaultPriceExTax(),
             'default_price_inc_tax' => $this->defaultPriceIncTax(),
             'calculated_price_ex_tax' => $this->calculatedPriceExTax(),
             'calculated_price_inc_tax' => $this->calculatedPriceIncTax(),
             'price_ex_tax' => $this->priceExTax(),
-            'price_inc_tax' => $this->priceIncTax(),
+            'price_inc_tax' => $this->priceIncTax(), */
             'currency' => config('shop.currency'),
             'sku' => $this->sku,
             'published' => (bool) $this->published

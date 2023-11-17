@@ -12,12 +12,10 @@ return new class () extends Migration {
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('parent_id')->nullable();
+            $table->unsignedInteger('parent_id')->nullable()->index();
             $table->string('name');
             $table->text('description')->nullable();
             $table->timestamps();
-
-            $table->index('parent_id');
         });
     }
 

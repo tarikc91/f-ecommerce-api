@@ -19,25 +19,26 @@ class ProductRelationshipsSeeder extends Seeder
         $categories = collect(Category::all()->modelKeys());
         $priceLists = collect(PriceList::all()->modelKeys());
 
-        Product::limit(25000)->chunk(1000, function ($products) use ($categories, $priceLists) {
-            $categoriesData = [];
-            $priceListsData = [];
+        Product::withoutGlobalScopes()
+            ->limit(40000)->chunk(1000, function ($products) use ($categories, $priceLists) {
+                $categoriesData = [];
+                $priceListsData = [];
 
-            foreach ($products as $product) {
-                $categoriesData[] = [
-                    'product_id' => $product->id,
-                    'category_id' => $categories->random()
-                ];
+                foreach ($products as $product) {
+                    $categoriesData[] = [
+                        'product_id' => $product->id,
+                        'category_id' => $categories->random()
+                    ];
 
-                $priceListsData[] = [
-                    'product_id' => $product->id,
-                    'price_list_id' => $priceLists->random(),
-                    'price' => fake()->numberBetween(100, 1000)
-                ];
-            }
+                    $priceListsData[] = [
+                        'product_id' => $product->id,
+                        'price_list_id' => $priceLists->random(),
+                        'price' => fake()->numberBetween(100, 1000)
+                    ];
+                }
 
-            CategoryProduct::insert($categoriesData);
-            PriceListProduct::insert($priceListsData);
-        });
+                CategoryProduct::insert($categoriesData);
+                PriceListProduct::insert($priceListsData);
+            });
     }
 }

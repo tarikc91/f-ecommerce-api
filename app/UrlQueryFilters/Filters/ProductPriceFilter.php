@@ -17,21 +17,21 @@ class ProductPriceFilter implements Filter
     public static function handle(Builder $query, ?string $filterValue): Builder
     {
         if(!self::isRange($filterValue)) {
-            return $query->where('products.price', self::normalize($filterValue));
+            return $query->having('final_price', '=', self::normalize($filterValue));
         }
 
         list($min, $max) = self::getRangeValues($filterValue);
 
         if(is_null($min) && $max) {
-            return $query->where('products.price', '<=', $max);
+            return $query->having('final_price', '<=', $max);
         }
 
         if($min && is_null($max)) {
-            return $query->where('products.price', '>=', $min);
+            return $query->having('final_price', '>=', $min);
         }
 
         if($min && $max) {
-            return $query->whereBetween('products.price', [$min, $max]);
+            return $query->havingBetween('final_price', [$min, $max]);
         }
 
         return $query;

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use App\UrlQueryFilters\Filters\ProductNameFilter;
-use App\UrlQueryFilters\Filters\ProductOrderByName;
 use App\UrlQueryFilters\Filters\ProductPriceFilter;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\UrlQueryFilters\Filters\ProductCategoriesFilter;
+use App\UrlQueryFilters\Filters\ProductOrderByNameFilter;
 use App\UrlQueryFilters\Filterable as UrlQueryFilterable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\UrlQueryFilters\Filters\ProductOrderByPriceFilter;
@@ -37,10 +38,10 @@ class Product extends Model
      * @var array<string,object>
      */
     protected static array $urlQueryFilters = [
-        'categories' => ProductCategoriesFilter::class,
         'name' => ProductNameFilter::class,
         'price' => ProductPriceFilter::class,
-        'orderbyname' => ProductOrderByName::class,
+        'categories' => ProductCategoriesFilter::class,
+        'orderbyname' => ProductOrderByNameFilter::class,
         'orderbyprice' => ProductOrderByPriceFilter::class
     ];
 
@@ -52,7 +53,10 @@ class Product extends Model
         static::addGlobalScope(
             'prices',
             function (Builder $builder) {
-                $builder->withPriceListPrice(1)->withContractPrice();
+                $builder
+                    ->withPriceListPrice(1)
+                    ->withContractPrice()
+                    ->withCalculatedPrice();
             }
         );
     }
@@ -79,7 +83,7 @@ class Product extends Model
     }
 
     /**
-     * Scope that fetches the price for the price list id
+     * Scope that fetches the price based on the price list id
      *
      * @param Builder $query
      * @param integer $priceListId
@@ -96,23 +100,37 @@ class Product extends Model
     }
 
     /**
-     * Scope that fetches the price for the auth user
+     * Scope that fetches the price based on the contract list
      *
      * @param Builder $query
      * @return void
      */
     public function scopeWithContractPrice(Builder $query): void
     {
-        if(auth()->guest()) {
-            return;
-        }
-
         $query->addSelect([
             'contract_price' => ContractListProduct::select('price')
                 ->whereColumn('product_id', 'products.id')
-                ->where('user_id', auth()->id())
+                ->where('user_id', auth('sanctum')->id())
                 ->take(1)
         ]);
+    }
+
+    /**
+     * Scope that fetches the calculated price for the product takin into account all available prices
+     *
+     * @param Builder $query
+     * @return void
+     */
+    public function scopeWithCalculatedPrice(Builder $query): void
+    {
+        $query->addSelect(
+            DB::raw("
+            (SELECT CASE 
+                WHEN `contract_price` > 0 THEN `contract_price`
+                WHEN `price_list_price` > 0 THEN `price_list_price`
+                WHEN `price` > 0 THEN `price`
+            END) as `final_price`")
+        );
     }
 
     /**

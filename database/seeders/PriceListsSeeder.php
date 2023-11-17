@@ -14,7 +14,7 @@ class PriceListsSeeder extends Seeder
     {
         $data = [];
 
-        for($i = 0; $i < 1000; $i++) {
+        for($i = 0; $i < 10; $i++) {
             $data[] = array_merge(
                 PriceList::factory()->make()->toArray(),
                 [

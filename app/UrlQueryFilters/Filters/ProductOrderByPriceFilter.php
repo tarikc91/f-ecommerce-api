@@ -18,7 +18,7 @@ class ProductOrderByPriceFilter implements Filter
     {
         // orderBy=price,asc|desc
         return in_array($direction, ['asc', 'desc']) ?
-            $query->orderBy('price', $direction) :
-            $query->orderBy('price');
+            $query->orderBy('final_price', $direction) :
+            $query->orderBy('final_price');
     }
 }
