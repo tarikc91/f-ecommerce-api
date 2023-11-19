@@ -11,12 +11,11 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::create('price_list_product', function (Blueprint $table) {
-            $table->increments('id');
             $table->unsignedInteger('price_list_id');
             $table->unsignedInteger('product_id');
             $table->unsignedDecimal('price', 8, 4)->index();
 
-            $table->unique(['price_list_id', 'product_id']);
+            $table->primary(['price_list_id', 'product_id']);
             $table->foreign('product_id')->references('id')->on('products')->cascadeOnDelete();
             $table->foreign('price_list_id')->references('id')->on('price_lists')->cascadeOnDelete();
         });
