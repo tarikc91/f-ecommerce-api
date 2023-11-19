@@ -39,7 +39,7 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         Route::bind('publishedProduct', function (string $value) {
-            return Product::where('id', $value)
+            return Product::where('products.id', $value)
                 ->wherePublished()
                 ->firstOrFail();
         });

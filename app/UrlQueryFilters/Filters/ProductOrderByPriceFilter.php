@@ -11,7 +11,7 @@ class ProductOrderByPriceFilter implements Filter
      * Handles the filtering
      *
      * @param Builder $query
-     * @param string|null $filterValue
+     * @param string|null $direction
      * @return Builder
      */
     public static function handle(Builder $query, ?string $direction): Builder

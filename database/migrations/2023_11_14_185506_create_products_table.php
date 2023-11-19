@@ -14,7 +14,7 @@ return new class () extends Migration {
             $table->increments('id');
             $table->string('name')->index();
             $table->text('description')->nullable();
-            $table->unsignedDecimal('price', 8, 4);
+            $table->unsignedDecimal('price', 8, 4)->index();
             $table->string('sku')->unique();
             $table->boolean('published')->default(false);
             $table->timestamps();

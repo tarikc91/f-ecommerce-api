@@ -68,7 +68,7 @@ trait ProductScopes
             (SELECT CASE 
                 WHEN `contract_price` > 0 THEN `contract_price`
                 WHEN `price_list_price` > 0 THEN `price_list_price`
-                WHEN `price` > 0 THEN `price`
+                WHEN `products`.price > 0 THEN `products`.price
             END) as `final_price`")
         );
     }
