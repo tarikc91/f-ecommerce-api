@@ -22,16 +22,16 @@ class CategoryProductTest extends TestCase
 
     public function test_get_category_products(): void
     {
-        // Prepare a category and attach products to it
         $category = Category::factory()->create();
-        Product::factory(30)->hasAttached($category)->create();
+        Product::factory(10)->hasAttached($category)->create(['published' => true]);
+        Product::factory(10)->hasAttached($category)->create(['published' => false]);
 
         $this->getJson("/api/categories/{$category->id}/products")
             ->assertStatus(200)
             ->assertJson(
                 fn(AssertableJson $json) =>
                 $json->hasAll(['data', 'links', 'meta'])
-                    ->has('data.products', 25)
+                    ->has('data.products', 10)
                     ->has(
                         'data.products.0',
                         fn(AssertableJson $json) =>

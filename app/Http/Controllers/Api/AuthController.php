@@ -13,30 +13,26 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
-     * Login user
+     * Login a user
      *
      * @param LoginRequest $request
      * @return array
      */
     public function login(LoginRequest $request): array
     {
-        $user = User::checkUserCredentials($request->email, $request->password);
-
-        if(!$user) {
+        if(!$user = User::checkUserCredentials($request->email, $request->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'email' => ['The provided credentials are incorrect.']
             ]);
         }
 
-        $token = $user->createToken('auth_token');
-
         return [
-            'token' => $token->plainTextToken
+            'token' => $user->createToken('auth_token')->plainTextToken
         ];
     }
 
     /**
-     * Register user
+     * Register a user
      *
      * @param RegisterRequest $request
      * @return UserResource

@@ -16,11 +16,9 @@ class ProductNameFilter implements Filter
      */
     public static function handle(Builder $query, ?string $filterValue): Builder
     {
-        // name=some+name
-        return empty($filterValue) ?
-            $query :
-            $query->where('products.name', 'LIKE', "{$filterValue}%"); 
-            // I'm not doing a wildcard for the begging of the string because 
-            // I want to utilize the db index to make the query faster by sacrificing some results
+        // I'm not doing a wildcard for the begging of the string because
+        // I want to utilize the db index to make the query faster by sacrificing some results
+        return !empty($filterValue) ?
+            $query->where('products.name', 'LIKE', "{$filterValue}%") : $query;
     }
 }

@@ -18,7 +18,7 @@ trait Filterable
         $query = static::query();
 
         foreach($filters as $key => $value) {
-            $query = self::handleQueryParameter($query, $key, $value);
+            $query = static::handleQueryParameter($query, $key, $value);
         }
 
         return $query;
@@ -34,7 +34,7 @@ trait Filterable
      */
     private static function handleQueryParameter(Builder $query, string $filterKey, ?string $filterValue): Builder
     {
-        list($key, $value) = self::normalize([$filterKey, $filterValue]);
+        list($key, $value) = static::normalize([$filterKey, $filterValue]);
 
         if($key === 'orderby') {
             $values = explode(',', $value);
@@ -42,9 +42,7 @@ trait Filterable
             $value = $values[1] ?? 'asc';
         }
 
-        return array_key_exists($key, static::getUrlQueryFilters()) ?
-            static::getUrlQueryFilters()[$key]::handle($query, $value) :
-            $query;
+        return static::callQueryFilterClass($query, $key, $value);
     }
 
     /**
@@ -56,7 +54,7 @@ trait Filterable
      */
     private static function getUrlQueryFilters(): array
     {
-        if(isset(static::$urlQueryFilters)) {
+        if(property_exists(static::class, 'urlQueryFilters')) {
             return static::$urlQueryFilters;
         }
 
@@ -72,5 +70,19 @@ trait Filterable
     private static function normalize(array $values): array
     {
         return array_map(fn($value) => strtolower($value), $values);
+    }
+
+    /**
+     * Calles the query filter class if it exists
+     *
+     * @param Builder $query
+     * @param string $key
+     * @param string $value
+     * @return Builder
+     */
+    public static function callQueryFilterClass(Builder $query, string $key, string $value): Builder
+    {
+        return array_key_exists($key, static::getUrlQueryFilters()) ?
+            static::getUrlQueryFilters()[$key]::handle($query, $value) : $query;
     }
 }

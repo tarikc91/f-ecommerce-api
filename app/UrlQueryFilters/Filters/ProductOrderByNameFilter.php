@@ -16,7 +16,6 @@ class ProductOrderByNameFilter implements Filter
      */
     public static function handle(Builder $query, ?string $direction): Builder
     {
-        // orderBy=name,asc|desc
         return in_array($direction, ['asc', 'desc']) ?
             $query->orderBy('name', $direction) :
             $query->orderBy('name');

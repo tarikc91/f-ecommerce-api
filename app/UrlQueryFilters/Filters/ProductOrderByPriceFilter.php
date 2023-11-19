@@ -16,7 +16,6 @@ class ProductOrderByPriceFilter implements Filter
      */
     public static function handle(Builder $query, ?string $direction): Builder
     {
-        // orderBy=price,asc|desc
         return in_array($direction, ['asc', 'desc']) ?
             $query->orderBy('final_price', $direction) :
             $query->orderBy('final_price');

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
+use App\QueryScopes\ProductScopes;
 use Illuminate\Database\Eloquent\Model;
 use App\UrlQueryFilters\Filters\ProductNameFilter;
 use App\UrlQueryFilters\Filters\ProductPriceFilter;
@@ -17,6 +17,7 @@ use App\UrlQueryFilters\Filters\ProductOrderByPriceFilter;
 class Product extends Model
 {
     use HasFactory;
+    use ProductScopes;
     use UrlQueryFilterable;
 
     /**
@@ -47,22 +48,22 @@ class Product extends Model
 
     /**
      * The "booted" method of the model.
+     *
+     * @return void
      */
     protected static function booted(): void
     {
         static::addGlobalScope(
             'prices',
-            function (Builder $builder) {
-                $builder
-                    ->withPriceListPrice(1)
-                    ->withContractPrice()
-                    ->withCalculatedPrice();
-            }
+            fn(Builder $builder) => $builder
+                ->withPriceListPrice()
+                ->withContractPrice()
+                ->withFinalPrice()
         );
     }
 
     /**
-     * Gets all categories of a product
+     * Categories relationship
      *
      * @return BelongsToMany
      */
@@ -72,69 +73,7 @@ class Product extends Model
     }
 
     /**
-     * Scope that fetches published products
-     *
-     * @param Builder $query
-     * @return void
-     */
-    public function scopeWherePublished(Builder $query): void
-    {
-        $query->where('published', true);
-    }
-
-    /**
-     * Scope that fetches the price based on the price list id
-     *
-     * @param Builder $query
-     * @param integer $priceListId
-     * @return void
-     */
-    public function scopeWithPriceListPrice(Builder $query, int $priceListId): void
-    {
-        $query->addSelect([
-            'price_list_price' => PriceListProduct::select('price')
-                ->whereColumn('product_id', 'products.id')
-                ->where('price_list_id', $priceListId)
-                ->take(1)
-        ]);
-    }
-
-    /**
-     * Scope that fetches the price based on the contract list
-     *
-     * @param Builder $query
-     * @return void
-     */
-    public function scopeWithContractPrice(Builder $query): void
-    {
-        $query->addSelect([
-            'contract_price' => ContractListProduct::select('price')
-                ->whereColumn('product_id', 'products.id')
-                ->where('user_id', auth('sanctum')->id())
-                ->take(1)
-        ]);
-    }
-
-    /**
-     * Scope that fetches the calculated price for the product takin into account all available prices
-     *
-     * @param Builder $query
-     * @return void
-     */
-    public function scopeWithCalculatedPrice(Builder $query): void
-    {
-        $query->addSelect(
-            DB::raw("
-            (SELECT CASE 
-                WHEN `contract_price` > 0 THEN `contract_price`
-                WHEN `price_list_price` > 0 THEN `price_list_price`
-                WHEN `price` > 0 THEN `price`
-            END) as `final_price`")
-        );
-    }
-
-    /**
-     * Gets all price lists for the product
+     * Price lists relationship
      *
      * @return BelongsToMany
      */
@@ -146,68 +85,82 @@ class Product extends Model
     }
 
     /**
-     * Default product price excluding tax
-     *
-     * @return float
-     */
-    public function defaultPriceExTax(): float
-    {
-        return (float) ($this->price / 100);
-    }
-
-    /**
-     * Default product price including tax
-     *
-     * @return float
-     */
-    public function defaultPriceIncTax(): float
-    {
-        return (float) ($this->defaultPriceExTax() * config('shop.tax_rate'));
-    }
-
-    /**
-     * Product price calculated by contract price and price list price excluding taxes
-     * Contract price has priority over price list price
+     * Price excluding tax
      *
      * @return float|null
      */
-    public function calculatedPriceExTax(): ?float
+    public function priceExTax(): ?float
     {
-        $price = $this->contract_price ?? $this->price_list_price ?? null;
-
-        return isset($price) ? (float) ($price / 100) : null;
+        return $this->price ?? null;
     }
 
     /**
-     * Product price calculated by contract price and price list price including taxes
-     * Contract price has priority over price list price
+     * Price including tax
      *
      * @return float|null
      */
-    public function calculatedPriceIncTax(): ?float
+    public function priceIncTax(): ?float
     {
-        return $this->calculatedPriceExTax() ?
-            (float) ($this->calculatedPriceExTax() * config('shop.tax_rate')) :
-            null;
+        return $this->priceExTax() ? addTax($this->priceExTax()) : null;
     }
 
     /**
-     * Final price excluding taxes
+     * Price list price excluding tax
      *
-     * @return float
+     * @return float|null
      */
-    public function priceExTax(): float
+    public function priceListPriceExTax(): ?float
     {
-        return $this->calculatedPriceExTax() ?? $this->defaultPriceExTax();
+        return $this->price_list_price ?? null;
     }
 
     /**
-     * Final price including taxes
+     * Price list price including tax
      *
-     * @return float
+     * @return float|null
      */
-    public function priceIncTax(): float
+    public function priceListPriceIncTax(): ?float
     {
-        return (float) ($this->priceExTax() * config('shop.tax_rate'));
+        return $this->priceListPriceExTax() ? addTax($this->priceListPriceExTax()) : null;
+    }
+
+    /**
+     * Contract price excluding tax
+     *
+     * @return float|null
+     */
+    public function contractPriceExTax(): ?float
+    {
+        return $this->contract_price ?? null;
+    }
+
+    /**
+     * Contract price including tax
+     *
+     * @return float|null
+     */
+    public function contractPriceIncTax(): ?float
+    {
+        return $this->contractPriceExTax() ? addTax($this->contractPriceExTax()) : null;
+    }
+
+    /**
+     * Final price excluding tax
+     *
+     * @return float|null
+     */
+    public function finalPriceExTax(): ?float
+    {
+        return $this->final_price ?? null;
+    }
+
+    /**
+     * Final price including tax
+     *
+     * @return float|null
+     */
+    public function finalPriceIncTax(): ?float
+    {
+        return $this->finalPriceExTax() ? addTax($this->finalPriceExTax()) : null;
     }
 }

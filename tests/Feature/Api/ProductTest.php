@@ -19,9 +19,9 @@ class ProductTest extends TestCase
             ->assertStatus(404);
     }
 
-    public function test_show_product(): void
+    public function test_can_show_published_product(): void
     {
-        $product = Product::factory()->create();
+        $product = Product::factory()->create(['published' => true]);
 
         $this->getJson("/api/products/{$product->id}")
             ->assertStatus(200)
@@ -33,6 +33,14 @@ class ProductTest extends TestCase
                         $json->whereAllType(ProductResponse::getJsonAttributes())
                 )
             );
+    }
+
+    public function test_cant_show_unpublished_product(): void
+    {
+        $product = Product::factory()->create(['published' => false]);
+
+        $this->getJson("/api/products/{$product->id}")
+            ->assertStatus(404);
     }
 
     public function test_get_no_products(): void
@@ -49,15 +57,15 @@ class ProductTest extends TestCase
 
     public function test_get_products(): void
     {
-        // Prepare some products
-        Product::factory(30)->create();
+        Product::factory(10)->create(['published' => true]);
+        Product::factory(10)->create(['published' => false]);
 
         $this->getJson('/api/products')
             ->assertStatus(200)
             ->assertJson(
                 fn(AssertableJson $json) =>
                 $json->hasAll(['data', 'links', 'meta'])
-                    ->has('data.products', 25)
+                    ->has('data.products', 10)
                     ->has(
                         'data.products.0',
                         fn(AssertableJson $json) =>
@@ -65,4 +73,7 @@ class ProductTest extends TestCase
                     )
             );
     }
+
+    // TODO: tests for product filters and sorting
+    // TODO: tests for price list header and user contract
 }

@@ -11,7 +11,7 @@ use App\Http\Resources\ProductCollection;
 class ProductsController extends Controller
 {
     /**
-     * Gets paginated products
+     * Get paginated products
      *
      * @param Request $request
      * @return ProductCollection

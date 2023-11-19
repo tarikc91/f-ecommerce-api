@@ -19,7 +19,7 @@ class ProductFactory extends Factory
         return [
             'name' => ucfirst(fake()->words(3, true)),
             'description' => fake()->text(),
-            'price' => fake()->numberBetween(100, 1000),
+            'price' => fake()->randomFloat(2, 10, 1000),
             'sku' => fake()->bothify('???-######'),
             'published' => fake()->boolean()
         ];

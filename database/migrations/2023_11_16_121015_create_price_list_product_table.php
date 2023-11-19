@@ -14,11 +14,11 @@ return new class () extends Migration {
             $table->increments('id');
             $table->unsignedInteger('price_list_id');
             $table->unsignedInteger('product_id');
-            $table->unsignedInteger('price');
+            $table->unsignedDecimal('price', 8, 4);
 
             $table->unique(['price_list_id', 'product_id']);
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            $table->foreign('price_list_id')->references('id')->on('price_lists')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->cascadeOnDelete();
+            $table->foreign('price_list_id')->references('id')->on('price_lists')->cascadeOnDelete();
         });
     }
 

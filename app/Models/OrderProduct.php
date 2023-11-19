@@ -5,16 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class ContractListProduct extends Pivot
+class OrderProduct extends Pivot
 {
     use HasFactory;
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -22,8 +15,13 @@ class ContractListProduct extends Pivot
      * @var array
      */
     protected $fillable = [
-        'price',
         'product_id',
-        'user_id'
+        'quantity',
+        'price_ex_tax',
+        'price_inc_tax',
+        'price_tax',
+        'total_price_ex_tax',
+        'total_price_inc_tax',
+        'total_price_tax'
     ];
 }

@@ -15,9 +15,17 @@ class ProductResponse
             'id' => 'integer',
             'name' => 'string',
             'description' => 'string',
-            'price' => 'integer',
             'sku' => 'string',
-            'published' => 'boolean'
+            'published' => 'boolean',
+            'price_ex_tax' => 'double',
+            'price_inc_tax' => 'double',
+            'price_list_price_ex_tax' => 'double|null',
+            'price_list_price_inc_tax' => 'double|null',
+            'contract_price_ex_tax' => 'double|null',
+            'contract_price_inc_tax' => 'double|null',
+            'final_price_ex_tax' => 'double',
+            'final_price_inc_tax' => 'double',
+            'currency' => 'string'
         ];
     }
 }

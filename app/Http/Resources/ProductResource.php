@@ -15,21 +15,17 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => (int) $this->id,
+            'id' => $this->id,
             'name' => $this->name,
             'description'  => $this->description,
-
-            'price' => $this->price,
-            'price_list_price' => $this->price_list_price,
-            'contract_price' => $this->contract_price,
-            'final_price' => $this->final_price,
-
-            /* 'default_price_ex_tax' => $this->defaultPriceExTax(),
-            'default_price_inc_tax' => $this->defaultPriceIncTax(),
-            'calculated_price_ex_tax' => $this->calculatedPriceExTax(),
-            'calculated_price_inc_tax' => $this->calculatedPriceIncTax(),
             'price_ex_tax' => $this->priceExTax(),
-            'price_inc_tax' => $this->priceIncTax(), */
+            'price_inc_tax' => $this->priceIncTax(),
+            'price_list_price_ex_tax' => $this->priceListPriceExTax(),
+            'price_list_price_inc_tax' => $this->priceListPriceIncTax(),
+            'contract_price_ex_tax' => $this->contractPriceExTax(),
+            'contract_price_inc_tax' => $this->contractPriceIncTax(),
+            'final_price_ex_tax' => $this->finalPriceExTax(),
+            'final_price_inc_tax' => $this->finalPriceIncTax(),
             'currency' => config('shop.currency'),
             'sku' => $this->sku,
             'published' => (bool) $this->published

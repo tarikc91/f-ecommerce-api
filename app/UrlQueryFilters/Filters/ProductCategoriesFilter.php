@@ -16,12 +16,10 @@ class ProductCategoriesFilter implements Filter
      */
     public static function handle(Builder $query, ?string $filterValue): Builder
     {
-        // categories=1,2,3
-        return empty($filterValue) ?
-            $query :
+        return !empty($filterValue) ?
             $query->whereHas(
                 'categories',
                 fn($query) => $query->whereIn('categories.id', explode(',', $filterValue))
-            );
+            ) : $query;
     }
 }
