@@ -19,7 +19,8 @@ class CategoryProductsController extends Controller
         $products = $category
             ->products()
             ->wherePublished()
-            ->paginate(25);
+            ->simplePaginate(25)
+            ->withQueryString();
 
         return new ProductCollection($products);
     }

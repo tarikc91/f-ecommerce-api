@@ -20,7 +20,8 @@ class ProductsController extends Controller
     {
         $products = Product::filter($request->all())
             ->wherePublished()
-            ->paginate(25);
+            ->simplePaginate(25)
+            ->withQueryString();
 
         return new ProductCollection($products);
     }

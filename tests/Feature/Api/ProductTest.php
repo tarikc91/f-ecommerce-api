@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\PriceList;
+use App\Models\PriceListProduct;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use Tests\TestCase;
@@ -74,6 +76,102 @@ class ProductTest extends TestCase
             );
     }
 
-    // TODO: tests for product filters and sorting
-    // TODO: tests for price list header and user contract
+    public function test_get_products_order_by_price(): void
+    {
+        $product1 = Product::factory()->create([
+            'published' => true,
+            'price' => 10
+        ]);
+
+        $product2 = Product::factory()->create([
+            'published' => true,
+            'price' => 20
+        ]);
+
+        // ASC
+        $response = $this->getJson('/api/products?orderBy=price,asc')
+            ->assertStatus(200);
+
+        $products = $response->getData()->data->products;
+
+        $this->assertEquals($product1->id, $products[0]->id);
+        $this->assertEquals($product2->id, $products[1]->id);
+
+        // DESC
+        $response = $this->getJson('/api/products?orderBy=price,desc')
+            ->assertStatus(200);
+
+        $products = $response->getData()->data->products;
+
+        $this->assertEquals($product2->id, $products[0]->id);
+        $this->assertEquals($product1->id, $products[1]->id);
+    }
+
+    public function test_get_products_order_by_price_with_price_overrides(): void
+    {
+        $product1 = Product::factory()->create([
+            'price' => 50,
+            'published' => true
+        ]);
+
+        $product2 = Product::factory()->create([
+            'price' => 30,
+            'published' => true
+        ]);
+
+        $priceList = PriceList::factory()->create();
+        $priceList->products()
+            ->attach($product1->id, [
+                'price' => 25
+            ]);
+
+        // ASC
+        $response = $this->getJson('/api/products?orderBy=price,asc', ['X-Price-List' => $priceList->id])
+            ->assertStatus(200);
+
+        $products = $response->getData()->data->products;
+
+        $this->assertEquals($product1->id, $products[0]->id);
+        $this->assertEquals($product2->id, $products[1]->id);
+
+        // DESC
+        $response = $this->getJson('/api/products?orderBy=price,desc', ['X-Price-List' => $priceList->id])
+            ->assertStatus(200);
+
+        $products = $response->getData()->data->products;
+
+        $this->assertEquals($product2->id, $products[0]->id);
+        $this->assertEquals($product1->id, $products[1]->id);
+    }
+
+    public function test_get_products_order_by_name(): void
+    {
+        $product1 = Product::factory()->create([
+            'name' => 'A Product',
+            'published' => true
+        ]);
+
+        $product2 = Product::factory()->create([
+            'name' => 'B Product',
+            'published' => true
+        ]);
+
+        // ASC
+        $response = $this->getJson('/api/products?orderBy=name,asc')
+            ->assertStatus(200);
+
+        $products = $response->getData()->data->products;
+
+        $this->assertEquals($product1->id, $products[0]->id);
+        $this->assertEquals($product2->id, $products[1]->id);
+
+        // DESC
+        $response = $this->getJson('/api/products?orderBy=name,desc')
+            ->assertStatus(200);
+
+        $products = $response->getData()->data->products;
+
+        $this->assertEquals($product2->id, $products[0]->id);
+        $this->assertEquals($product1->id, $products[1]->id);
+    }
 }

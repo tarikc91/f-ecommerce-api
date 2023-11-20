@@ -2,9 +2,7 @@
 
 namespace App\QueryScopes;
 
-use App\Models\PriceListProduct;
 use Illuminate\Support\Facades\DB;
-use App\Models\ContractListProduct;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 
 trait ProductScopes
@@ -29,12 +27,16 @@ trait ProductScopes
      */
     public function scopeWithPriceListPrice(Builder $query): void
     {
-        $query->addSelect([
-            'price_list_price' => PriceListProduct::select('price')
-                ->whereColumn('product_id', 'products.id')
-                ->where('price_list_id', request()->header('X-Price-List') ?? null)
-                ->take(1)
-        ]);
+        if (is_null($query->getQuery()->columns)) {
+            $query->select($this->qualifyColumn('*'));
+        }
+
+        $query->leftJoin('price_list_product', function ($join) {
+            $join->on('price_list_product.product_id', '=', 'products.id')
+                ->on('price_list_product.price_list_id', '=', DB::raw(request()->header('X-Price-List') ?? 'null'));
+        });
+
+        $query->addSelect('price_list_product.price as price_list_price');
     }
 
     /**
@@ -45,12 +47,16 @@ trait ProductScopes
      */
     public function scopeWithContractPrice(Builder $query): void
     {
-        $query->addSelect([
-            'contract_price' => ContractListProduct::select('price')
-                ->whereColumn('product_id', 'products.id')
-                ->where('user_id', auth('sanctum')->id())
-                ->take(1)
-        ]);
+        if (is_null($query->getQuery()->columns)) {
+            $query->select($this->qualifyColumn('*'));
+        }
+
+        $query->leftJoin('contract_list_product', function ($join) {
+            $join->on('contract_list_product.product_id', '=', 'products.id')
+                ->on('contract_list_product.user_id', '=', DB::raw(auth('sanctum')->id() ?? 'null'));
+        });
+
+        $query->addSelect('contract_list_product.price as contract_price');
     }
 
     /**
