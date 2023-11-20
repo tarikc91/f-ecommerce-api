@@ -20,7 +20,8 @@ class ProductRelationshipsSeeder extends Seeder
         $priceLists = collect(PriceList::all()->modelKeys());
 
         Product::withoutGlobalScopes()
-            ->limit(40000)->chunk(1000, function ($products) use ($categories, $priceLists) {
+            ->limit(40000)
+            ->chunk(1000, function ($products) use ($categories, $priceLists) {
                 $categoriesData = [];
                 $priceListsData = [];
 
