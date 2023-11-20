@@ -15,7 +15,8 @@
 ## API Endpints
 Postman collection export <code>https://github.com/tarikc91/factory-ecommerce/blob/master/FactoryEcommerce.postman_collection.json</code>
 
-In order to simulate price list application add the header <code>X-Price-List</code> to the request with the ID of the desired price list.
+- In order to simulate price list application add the header <code>X-Price-List</code> to the request with the ID of the desired price list.
+- In order to simulate contract list application you have to register a user and login via API endpoints. Use the returned token as a Bearer token in requests. For testing purposes, when registering a user some contract_list_product records will be generated automatically. 
 
 1. <code>POST /api/register</code>
 2. <code>POST /api/login</code>
