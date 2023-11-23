@@ -12,6 +12,9 @@
 ## Database diagram
 <code>https://dbdiagram.io/d/factoryEcommerce-65539ac87d8bbd64652caa2d</code>
 
+## Inspect incoming requests
+To inspect incoming requests and check queries, models etc, navigate to <code>/telescope</code> route in the browser
+
 ## API Endpints
 Postman collection export <code>https://github.com/tarikc91/factory-ecommerce/blob/master/FactoryEcommerce.postman_collection.json</code>
 
